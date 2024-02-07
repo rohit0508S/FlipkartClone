@@ -1,6 +1,7 @@
 package com.shoping.flipkart.serviceImpl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -8,6 +9,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.shoping.flipkart.Repository.CustomerRepo;
 import com.shoping.flipkart.Repository.SellerRepo;
@@ -88,6 +90,9 @@ public class AuthServiceImpl implements AuthService{
 	    	else
 	    	{
 	    		//send an email to the client with otp
+	    		 
+	    		
+	    		    
 	    	}
 	    	return u;
 	    }).orElse(saveUser(userRequest));	   
@@ -99,5 +104,14 @@ public class AuthServiceImpl implements AuthService{
 		
 		return new  ResponseEntity<ResponseStructure<UserResponse>>(structure,HttpStatus.CREATED);
 	}
+	
+	
+    public void deleteNonVerifiedUsers() {
+		 List<User> nonVerifiedUsers = userRepo.findByIsEmailVerifiedFalse();
+	        userRepo.deleteAll(nonVerifiedUsers);
+    }
+	
+	
+	
 		
 }
