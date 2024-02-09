@@ -17,7 +17,7 @@ public CustomUserDetails(User user) {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		return Collections.singleton(null);
+		return Collections.singleton(new SimpleGrantedAuthority(user.getUserRole().name()));
 	}
 
 	@Override
@@ -40,6 +40,10 @@ public CustomUserDetails(User user) {
 
 	@Override
 	public boolean isAccountNonLocked() {
+<<<<<<< HEAD
+=======
+		
+>>>>>>> 96b7de73f3d39c5947513f037d3c211a0c9944c5
 		return true;
 	}
 
