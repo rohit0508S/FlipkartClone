@@ -2,11 +2,13 @@ package com.shoping.flipkart.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shoping.flipkart.request.OtpModel;
 import com.shoping.flipkart.request.UserRequest;
 import com.shoping.flipkart.response.UserResponse;
 import com.shoping.flipkart.service.AuthService;
@@ -24,4 +26,12 @@ public class AuthController {
 public ResponseEntity<ResponseStructure<UserResponse>> registerUser(@RequestBody UserRequest userRequest){
 	return authService.registerUser(userRequest);
 }
+
+@PostMapping("/verify-otp")
+public ResponseEntity<String> verifyOTP(@RequestBody OtpModel otpModel){
+	return authService.verifyOTP(otpModel);
+}
+
+
+
 }
