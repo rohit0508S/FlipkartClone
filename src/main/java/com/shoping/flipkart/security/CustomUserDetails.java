@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.shoping.flipkart.entity.User;
@@ -40,10 +41,7 @@ public CustomUserDetails(User user) {
 
 	@Override
 	public boolean isAccountNonLocked() {
-<<<<<<< HEAD
-=======
-		
->>>>>>> 96b7de73f3d39c5947513f037d3c211a0c9944c5
+
 		return true;
 	}
 
