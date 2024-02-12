@@ -38,9 +38,12 @@ import com.shoping.flipkart.service.AuthService;
 import com.shoping.flipkart.utility.CookieManager;
 import com.shoping.flipkart.utility.MessageStructure;
 import com.shoping.flipkart.utility.ResponseStructure;
+import com.shoping.flipkart.utility.SimpleResponseStructure;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -62,6 +65,7 @@ public class AuthServiceImpl implements AuthService{
 	private AccessTokenRepo accessTokenRepo;
 	private RefreshTokenRepo refreshTokenRepo;
 	private ResponseStructure<AuthResponse> authStructure;
+	private SimpleResponseStructure<AuthResponse> simpleresponseStructure;
 
 
 
@@ -74,7 +78,7 @@ public class AuthServiceImpl implements AuthService{
 	public AuthServiceImpl(JavaMailSender javaMailSender, SellerRepo sellerRepo, CustomerRepo customerRepo,
 			UserRepo userRepo, ResponseStructure<UserResponse> structure, CacheStore<String> otpCacheStore,
 			CacheStore<User> userCacheStore, AuthenticationManager authenticationManager, CookieManager cookieManager,JwtService jwtService
-			,AccessTokenRepo accessTokenRepo, RefreshTokenRepo refreshTokenRepo,
+			,AccessTokenRepo accessTokenRepo, RefreshTokenRepo refreshTokenRepo,SimpleResponseStructure<AuthResponse> responseStructure,
 			ResponseStructure<AuthResponse> authStructure) {
 		super();
 		this.javaMailSender = javaMailSender;
@@ -90,6 +94,7 @@ public class AuthServiceImpl implements AuthService{
 		this.jwtService=jwtService;
 		this.accessTokenRepo=accessTokenRepo;
 		this.refreshTokenRepo=refreshTokenRepo;
+		this.simpleresponseStructure=simpleresponseStructure;
 
 	}
 
@@ -172,11 +177,7 @@ public class AuthServiceImpl implements AuthService{
 			log.error("The email address does't exist");
 		}
 
-		try {
-			sendConfirmationMessage(user);
-		} catch (MessagingException e) {
-			log.error("Congrats your registration completed successfully!");
-		}
+
 		return new ResponseEntity<ResponseStructure<UserResponse>>(structure.setStatusCode(HttpStatus.OK.value())
 				.setMessage("Please Varify your email by OTP sent to your email")
 				.setData(mapToUserResponse(user)),HttpStatus.OK);
@@ -200,6 +201,12 @@ public class AuthServiceImpl implements AuthService{
 
 		user.setEmailVerified(true);
 		userRepo.save(user);
+		
+		try {
+		sendConfirmationMessage(user);
+	} catch (MessagingException e) {
+		log.error("Congrats your registration completed successfully!");
+	}
 		
 		
 		
@@ -315,7 +322,7 @@ public class AuthServiceImpl implements AuthService{
 			//generating the cookies and authResponse and returning to the client
 			
 			return userRepo.findByUsername(username).map(user->{
-				
+				grantAccess(response,user);
 				return ResponseEntity.ok(authStructure.setStatusCode(HttpStatus.OK.value()).setData(
 						AuthResponse.builder()
 						.userId(user.getUserId())
@@ -333,6 +340,69 @@ public class AuthServiceImpl implements AuthService{
 
 
 
+
+	
+//	@Override
+//	public ResponseEntity<ResponseStructure<AuthResponse>> logout(HttpServletRequest request,
+//			HttpServletResponse response) {
+//	String rt = null;
+//	String at = null;
+//	Cookie[]cookies=request.getCookies();
+//	for(Cookie cookie:cookies) {
+//		if(cookie.getName().equals("rt"))
+//			rt=cookie.getValue();
+//		if(cookie.getName().equals("at"))
+//			at=cookie.getValue();
+//		
+//	}
+//	accessTokenRepo.findByToken(at).ifPresent(accessToken->{
+//		accessToken.setBlocked(true);
+//		accessTokenRepo.save(accessToken);
+//	});
+//	refreshTokenRepo.findByToken(rt).ifPresent(refreshToken->{
+//		refreshToken.setBlocked(true);
+//		refreshTokenRepo.save(refreshToken);
+//	});
+//	
+//	response.addCookie(cookieManager.invalidate(new Cookie("at", "")));
+//	response.addCookie(cookieManager.invalidate(new Cookie("rt", "")));
+//	
+//	authStructure.setStatusCode(HttpStatus.OK.value());
+//	authStructure.setMessage("Logout successfull");
+//	
+//	
+//	return new ResponseEntity<ResponseStructure<AuthResponse>>(authStructure,HttpStatus.OK);
+//	}
+
+
+	@Override
+	public ResponseEntity<SimpleResponseStructure<AuthResponse>> logout(String refreshToken, String accessToken,
+			HttpServletResponse response) {
+		if(accessToken==null && refreshToken==null)
+			throw new IllegalArgumentException("User not login !");
+		
+		accessTokenRepo.findByToken(accessToken).ifPresent(token->{
+			token.setBlocked(true);
+			accessTokenRepo.save(token);
+		});
+		
+		refreshTokenRepo.findByToken(refreshToken).ifPresent(token->{
+			token.setBlocked(true);
+			refreshTokenRepo.save(token);
+		});
+		
+		response.addCookie(cookieManager.invalidate(new Cookie("at", "")));
+		response.addCookie(cookieManager.invalidate(new Cookie("rt", "")));
+		 SimpleResponseStructure<AuthResponse> authResponse = new SimpleResponseStructure<>();
+		    authResponse.setStatus(HttpStatus.OK.value());
+		    authResponse.setMessage("Logout successful");
+
+		    return new ResponseEntity<>(authResponse, HttpStatus.OK);
+	}
+
+
+
+	
 
 
 }
