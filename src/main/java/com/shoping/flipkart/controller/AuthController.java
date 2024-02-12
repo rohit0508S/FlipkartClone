@@ -20,17 +20,18 @@ import com.shoping.flipkart.service.AuthService;
 import com.shoping.flipkart.utility.ResponseStructure;
 import com.shoping.flipkart.utility.SimpleResponseStructure;
 
-import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 @RestController
 @AllArgsConstructor
 @EnableMethodSecurity
 @RequestMapping("/api/v1")
 public class AuthController {	
 	
-	AuthService authService;
+AuthService authService;
+	
 @PostMapping("/register")
 public ResponseEntity<ResponseStructure<UserResponse>> registerUser(@RequestBody UserRequest userRequest){
 	return authService.registerUser(userRequest);
