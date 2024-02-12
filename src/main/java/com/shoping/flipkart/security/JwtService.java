@@ -6,10 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+
 
 @Service
 public class JwtService {
@@ -43,4 +48,15 @@ public class JwtService {
 		byte[] secretbytes=Decoders.BASE64.decode(secret);
 	    return Keys.hmacShaKeyFor(secretbytes);
 	}
+	public Claims jwtParser(String token) {
+		JwtParser jwtParser=Jwts.parserBuilder().setSigningKey(getSignature()).build();
+		return jwtParser.parseClaimsJwt(token).getBody();
+		
+	}
+	
+	
+	public String extractUsername(String token) {
+		return jwtParser(token).getSubject();
+	}
+	
 }
