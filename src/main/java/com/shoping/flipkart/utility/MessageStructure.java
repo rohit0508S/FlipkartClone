@@ -14,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MessageStructure {
 private String to;
+private String from;
 private String subject;
 private Date sentDate;
 private String text;
