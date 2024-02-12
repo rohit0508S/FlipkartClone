@@ -53,8 +53,8 @@ public ResponseEntity<SimpleResponseStructure<AuthResponse>> logout(@CookieValue
 	return authService.logout(refreshToken,accessToken,response);
 }
 @PostMapping("/revoke-access")
-public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeAllDevice(String accessToken,String refreshToken,HttpServletResponse response){
-	return revokeAllDevice(accessToken,refreshToken,response);
+public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeOther(String accessToken,String refreshToken,HttpServletResponse response){
+	return revokeOther(accessToken,refreshToken,response);
 }
 
 

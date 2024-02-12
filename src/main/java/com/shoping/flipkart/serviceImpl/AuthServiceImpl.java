@@ -419,7 +419,8 @@ public class AuthServiceImpl implements AuthService{
 	
 	
 	@Override
-	public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeAllDevice(String accessToken,
+	public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeOther(String accessToken,
+			
 			String refreshToken, HttpServletResponse response) {
 		String user=SecurityContextHolder.getContext().getAuthentication().getName();
 		if(user==null)
