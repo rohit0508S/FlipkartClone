@@ -3,6 +3,7 @@ package com.shoping.flipkart.serviceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -312,7 +313,8 @@ public class AuthServiceImpl implements AuthService{
 	@Override
 	public ResponseEntity<ResponseStructure<AuthResponse>> login(AuthRequest authRequest,HttpServletResponse response) {
 		String username=authRequest.getEmail().split("@")[0];
-		UsernamePasswordAuthenticationToken token=new UsernamePasswordAuthenticationToken(authRequest.getPassword(), username);
+		
+		UsernamePasswordAuthenticationToken token=new UsernamePasswordAuthenticationToken(authRequest.getPassword(),username);
 		Authentication authentication=authenticationManager.authenticate(token);
 		if(!authentication.isAuthenticated()) {
 			throw new UsernameNotFoundException("Failed to authenticated the user");
@@ -334,8 +336,6 @@ public class AuthServiceImpl implements AuthService{
 						.build())
 						.setMessage("login successful ...!"));
 			}).get();
-
-		
 	}
 
 
@@ -401,7 +401,15 @@ public class AuthServiceImpl implements AuthService{
 	}
 
 
-
+	public void deleteExpiredTokens() {
+		LocalDateTime currentTime=LocalDateTime.now();
+		List<AccessToken> accessTokens = accessTokenRepo.findAllByExpirationBefore(currentTime);
+		List<RefreshToken> refreshToken = refreshTokenRepo.findAllByExpirationBefore(currentTime);
+		accessTokenRepo.deleteAll();
+		refreshTokenRepo.deleteAll();
+		
+	}
+	
 	
 
 

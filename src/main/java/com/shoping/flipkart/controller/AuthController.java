@@ -2,6 +2,8 @@ package com.shoping.flipkart.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 @RestController
 @AllArgsConstructor
+@EnableMethodSecurity
 @RequestMapping("/api/v1")
 public class AuthController {	
 	
@@ -37,11 +40,13 @@ public ResponseEntity<ResponseStructure<UserResponse>> registerUser(@RequestBody
 public ResponseEntity<String> verifyOTP(@RequestBody OtpModel otpModel){
 	return authService.verifyOTP(otpModel);
 }
+@PreAuthorize("hasAnyRole('CUSTOMER', 'SELLER')")
 @PostMapping("/login")
 public ResponseEntity<ResponseStructure<AuthResponse>> login(@RequestBody AuthRequest authRequest,HttpServletResponse response){
 	return authService.login(authRequest,response);
 }
 
+@PreAuthorize("hasAnyRole('CUSTOMER', 'SELLER')")
 @PostMapping("/logout")
 public ResponseEntity<SimpleResponseStructure<AuthResponse>> logout(@CookieValue(name="rt",required = false) String refreshToken ,@CookieValue(name="at" ,required=true)String accessToken,HttpServletResponse response){
 	return authService.logout(refreshToken,accessToken,response);
