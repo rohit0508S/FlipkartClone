@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -400,6 +401,12 @@ public class AuthServiceImpl implements AuthService{
 		    return new ResponseEntity<>(authResponse, HttpStatus.OK);
 	}
 
+	
+	
+	
+	
+	
+	
 
 	public void deleteExpiredTokens() {
 		LocalDateTime currentTime=LocalDateTime.now();
@@ -411,6 +418,43 @@ public class AuthServiceImpl implements AuthService{
 	}
 	
 	
+	@Override
+	public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeAllDevice(String accessToken,
+			String refreshToken, HttpServletResponse response) {
+		String user=SecurityContextHolder.getContext().getAuthentication().getName();
+		if(user==null)
+			throw new UsernameNotFoundException("User does't exists !");
+		userRepo.findByUsername(user).ifPresent(user1->{
+			blockAccessTokens(accessTokenRepo.findAllByUserAndIsBlockedAndTokenNot(user1,false,accessToken));
+			blockRefreshTokens(refreshTokenRepo.findAllByUserAndIsBlockedAndTokenNot(user1,false,refreshToken));
+		});
+		
+		
+		 SimpleResponseStructure<AuthResponse> authResponse = new SimpleResponseStructure<>();
+		    authResponse.setStatus(HttpStatus.OK.value());
+		    authResponse.setMessage("Logout successful");
 
+		    return new ResponseEntity<>(authResponse, HttpStatus.OK);
+	}
+	
+	
+	
+	private void blockAccessTokens(List<AccessToken> accessTokens) {
+		accessTokens.forEach(at->{
+			at.setBlocked(true);
+			accessTokenRepo.save(at);
+		});
+	}
+	private void blockRefreshTokens(List<RefreshToken> refreshTokens) {
+		refreshTokens.forEach(rt->{
+			rt.setBlocked(true);
+			refreshTokenRepo.save(rt);
+		});
+	}
+
+
+
+
+	
 
 }

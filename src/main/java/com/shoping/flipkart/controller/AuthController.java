@@ -23,14 +23,15 @@ import com.shoping.flipkart.utility.SimpleResponseStructure;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 @RestController
 @AllArgsConstructor
 @EnableMethodSecurity
 @RequestMapping("/api/v1")
 public class AuthController {	
 	
-	AuthService authService;
+AuthService authService;
+	
 @PostMapping("/register")
 public ResponseEntity<ResponseStructure<UserResponse>> registerUser(@RequestBody UserRequest userRequest){
 	return authService.registerUser(userRequest);
@@ -51,6 +52,11 @@ public ResponseEntity<ResponseStructure<AuthResponse>> login(@RequestBody AuthRe
 public ResponseEntity<SimpleResponseStructure<AuthResponse>> logout(@CookieValue(name="rt",required = false) String refreshToken ,@CookieValue(name="at" ,required=true)String accessToken,HttpServletResponse response){
 	return authService.logout(refreshToken,accessToken,response);
 }
+@PostMapping("/revoke-access")
+public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeAllDevice(String accessToken,String refreshToken,HttpServletResponse response){
+	return revokeAllDevice(accessToken,refreshToken,response);
+}
+
 
 
 }
