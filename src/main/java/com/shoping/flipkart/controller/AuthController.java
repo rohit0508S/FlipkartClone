@@ -20,7 +20,7 @@ import com.shoping.flipkart.service.AuthService;
 import com.shoping.flipkart.utility.ResponseStructure;
 import com.shoping.flipkart.utility.SimpleResponseStructure;
 
-
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -52,6 +52,11 @@ public ResponseEntity<ResponseStructure<AuthResponse>> login(@RequestBody AuthRe
 public ResponseEntity<SimpleResponseStructure<AuthResponse>> logout(@CookieValue(name="rt",required = false) String refreshToken ,@CookieValue(name="at" ,required=true)String accessToken,HttpServletResponse response){
 	return authService.logout(refreshToken,accessToken,response);
 }
+@PostMapping("/revoke-access")
+public ResponseEntity<SimpleResponseStructure<AuthResponse>> revokeAllDevice(String accessToken,String refreshToken,HttpServletResponse response){
+	return revokeAllDevice(accessToken,refreshToken,response);
+}
+
 
 
 }
